@@ -1,11 +1,16 @@
 /*
- * Usage of CDK Matrix
- *
- * File:   example1.cc
- * Author: Stephen Perkins
- * Email:  stephen.perkins@utdallas.edu
- */
-
+  * Filename           Makefile
+  * Date         05/05/2019
+  * Author       Riya Patel
+  * Email        rgp170030@utdallas.edu
+  * Course       CS 3377.502 Spring 2019
+  * Version      0.9
+  * Copyright2019, All Rights Reserved
+  *
+  * Description
+  *
+  *     This file contains the makefile which complies and links the project # * through the make command. 
+*/
 #include <iostream>
 #include "cdk.h"
 #include <string>
@@ -27,6 +32,18 @@ public:
   uint64_t numRecords;
 };
 
+/*
+ * Records in the file have a fixed length buffer
+ * that will hold a C-Style string. This is the
+ * size of the fixed length buffer.
+ */
+const int maxRecordStringLength = 25;
+class BinaryFileRecord
+{
+public:
+  uint8_t strLength;
+  char stringBuffer[maxRecordStringLength];
+};
 
 int main()
 {
@@ -64,13 +81,16 @@ int main()
       _exit(1);
     }
 
-  stringstream ss;  //for strings from file
-  stringstream s1; // for int from file
- 
-   drawCDKMatrix(myMatrix, true);
+  stringstream ss;  //string
+  stringstream s1; //int
+  stringstream s2;
+  stringstream s3;
+  stringstream s4; 
+  drawCDKMatrix(myMatrix, true);
 
-  BinaryFileHeader *myHeader = new BinaryFileHeader(); // create object for header
+  BinaryFileHeader *myHeader = new BinaryFileHeader(); //object for the binary file
   ifstream binInfile ("cs3377.bin", ios::in | ios::binary); // read binary file
+
   binInfile.read((char *) myHeader, sizeof(BinaryFileHeader));
   ss << "Magic: 0x" << std::hex << std::uppercase << myHeader->magicNumber; // use stringstream to  convert to string
   string temp=ss.str();
@@ -86,10 +106,45 @@ int main()
   temp=ss.str();
   setCDKMatrixCell(myMatrix, 1, 3, temp.c_str());
 
+
+
+  
+  BinaryFileRecord *myRecord=new BinaryFileRecord(); // create object for records
+  binInfile.read((char*)myRecord, sizeof(BinaryFileRecord)); // read inary file for records
+  int num=strlen(myRecord->stringBuffer); //to convert to int
+  s1 <<"strlen: " <<num;
+  temp=s1.str();
+  
+  setCDKMatrixCell(myMatrix, 2, 1, temp.c_str()); // to output to matrix cell
+  setCDKMatrixCell(myMatrix, 2, 2,myRecord->stringBuffer );
+
+  binInfile.read((char*)myRecord, sizeof(BinaryFileRecord)); // read binary file for next line
+  num=strlen(myRecord->stringBuffer);
+  s2<<"strlen: " <<num;
+  temp=s2.str();
+  setCDKMatrixCell(myMatrix, 3, 1, temp.c_str()); // set matrix 3,1 and 3,2
+  setCDKMatrixCell(myMatrix, 3, 2,myRecord->stringBuffer );    
+
+  binInfile.read((char*)myRecord, sizeof(BinaryFileRecord)); // read binary file for next line
+  num=strlen(myRecord->stringBuffer);
+  s3<<"strlen: " <<num;
+  temp=s3.str();
+  setCDKMatrixCell(myMatrix, 4, 1, temp.c_str());
+  setCDKMatrixCell(myMatrix, 4, 2,myRecord->stringBuffer );
+
+  binInfile.read((char*)myRecord, sizeof(BinaryFileRecord)); // read binary file for next line
+  num=strlen(myRecord->stringBuffer);
+  s4<< "strlen: " <<num;
+  temp=s4.str();
+  setCDKMatrixCell(myMatrix, 5, 1, temp.c_str());    // to set last 2 matrix spots in matrix
+  setCDKMatrixCell(myMatrix, 5, 2,myRecord->stringBuffer );
+
+
+
   /*
    * Dipslay a message
    */
-  setCDKMatrixCell(myMatrix, 2, 2, "Test Message");
+  setCDKMatrixCell(myMatrix, 2, 2, "Seed Money");
   drawCDKMatrix(myMatrix, true);    /* required  */
 
   unsigned char x;
